@@ -2,25 +2,74 @@
 
 [![skills.sh](https://skills.sh/b/baldvic/skills)](https://www.skills.sh/baldvic/skills)
 
-Portable Agent Skills library. Install from [skills.sh](https://www.skills.sh/baldvic/skills/skill-standard):
+Reusable **Agent Skills** for AI coding agents — procedural knowledge (workflows, checklists, format rules) that agents load when your task matches the skill’s `description`. Skills follow the open [Agent Skills](https://github.com/agentskills/agentskills) layout: each skill is a folder with a `SKILL.md` file plus optional `references/`, `scripts/`, and `assets/`.
+
+This repository is published on [skills.sh](https://www.skills.sh/baldvic/skills) and installable with the [skills CLI](https://www.skills.sh/docs/cli) (Cursor, Claude Code, Codex, and [other supported agents](https://www.skills.sh/docs)).
+
+## Install
+
+Install one skill:
 
 ```bash
 npx skills add baldvic/skills@skill-standard -y
 ```
 
-## skill-standard
+Install every skill in this repo:
 
-Meta-skill for authoring skills (open Agent Skills format) with eval and benchmark artifacts.
+```bash
+npx skills add baldvic/skills -y
+```
 
-- **Runtime:** fully self-contained under `skill-standard/` (no external repos required to author skills).
-- **Maintenance:** [references/upstream-sources.md](skill-standard/references/upstream-sources.md) lists [agentskills/agentskills](https://github.com/agentskills/agentskills) and [anthropics/skills](https://github.com/anthropics/skills) (`skill-creator`); [references/upstream-sync.md](skill-standard/references/upstream-sync.md) is the agent pipeline; [upstream.lock.json](skill-standard/upstream.lock.json) pins last merged commits.
+**Manual install:** copy a skill folder (for example `skill-standard/`) into your agent’s skills directory (e.g. `.cursor/skills/`, `.claude/skills/`, or the path your client documents). Keep the folder name identical to the skill’s `name` in frontmatter.
 
-Copy or install into your agent client's skills directory.
+Review skill content before use; installed skills run with the same permissions as your agent session.
 
-## Publishing on skills.sh
+## Skills
 
-There is no separate registration. A public GitHub repo with Agent Skills folders (`<name>/SKILL.md`) is installable via `npx skills add baldvic/skills` and gets a repo page at [skills.sh/baldvic/skills](https://www.skills.sh/baldvic/skills).
+| Skill | Purpose |
+|-------|---------|
+| [**skill-standard**](skill-standard/SKILL.md) | Author, validate, and improve portable skills — including evals and benchmarks to show a skill actually helps. |
 
-- **Leaderboard / install counts:** anonymous telemetry from the [skills CLI](https://www.skills.sh/docs/cli) when users install (opt out with `DISABLE_TELEMETRY=1`).
-- **Repo page layout:** optional [skills.sh.json](skills.sh.json) at the repo root ([customize docs](https://www.skills.sh/docs/customize)).
-- **Badge:** `[![skills.sh](https://skills.sh/b/owner/repo)](https://www.skills.sh/owner/repo)` — see [docs overview](https://www.skills.sh/docs).
+### skill-standard — when to use it
+
+Use **skill-standard** when you (or your agent) are:
+
+- Creating a new skill from a conversation or repo convention
+- Editing `SKILL.md` frontmatter or tightening activation triggers
+- Validating structure before sharing a skill
+- Running **with_skill / without_skill** evals and grading runs
+- Tuning descriptions so the right skill activates
+
+The skill is **self-contained**: format spec, validation checklist, eval JSON schemas, grader/analyzer procedures, and an optional benchmark aggregation script all live under `skill-standard/`. You do not need to clone Anthropic’s or other upstream repos to follow the workflow day to day.
+
+**High-level workflow:** capture intent → draft `skill-name/SKILL.md` → validate → add `evals/evals.json` → run eval matrix → grade → iterate description and content → (optional) aggregate benchmarks.
+
+**Start reading inside the skill:**
+
+| Topic | File |
+|-------|------|
+| Full format spec | [skill-standard/references/agent-skills-format.md](skill-standard/references/agent-skills-format.md) |
+| Pre-publish checklist | [skill-standard/references/validation.md](skill-standard/references/validation.md) |
+| Evals & benchmark artifacts | [skill-standard/references/eval-artifacts.md](skill-standard/references/eval-artifacts.md) |
+| Grading a run | [skill-standard/agents/grader.md](skill-standard/agents/grader.md) |
+
+**Maintenance:** [upstream-sources.md](skill-standard/references/upstream-sources.md) documents lineage from [agentskills/agentskills](https://github.com/agentskills/agentskills) and [anthropics/skills](https://github.com/anthropics/skills) (`skill-creator`); [upstream-sync.md](skill-standard/references/upstream-sync.md) describes refreshing this meta-skill; [upstream.lock.json](skill-standard/upstream.lock.json) pins last merged upstream commits.
+
+## Repository layout
+
+```
+skills/
+├── skills.sh.json          # Optional grouping for the skills.sh repo page
+├── skill-standard/
+│   ├── SKILL.md            # Entry point (read this first)
+│   ├── references/         # Format, validation, eval schemas
+│   ├── agents/             # Grader & analyzer roles
+│   └── scripts/            # Optional tooling (e.g. benchmark aggregation)
+└── LICENSE
+```
+
+Future skills will appear as sibling directories (`another-skill/SKILL.md`). [skills.sh.json](skills.sh.json) controls how skills are grouped on [the directory page](https://www.skills.sh/baldvic/skills).
+
+## License
+
+MIT — see [LICENSE](LICENSE). Individual skills may repeat the license in `SKILL.md` frontmatter.
