@@ -1,6 +1,7 @@
 ---
 name: skill-standard
 description: Create, validate, and improve portable Agent Skills with structured evals and benchmarks. Use when authoring or editing SKILL.md, validating frontmatter, writing evals/evals.json, running with_skill vs without_skill baselines, producing grading.json or benchmark.json, or tuning descriptions for activation — in any agent harness.
+license: MIT
 ---
 
 # Skill Standard

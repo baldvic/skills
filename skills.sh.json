@@ -1,0 +1,13 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Authoring",
+      "description": "Meta-skills for writing, validating, and benchmarking portable Agent Skills.",
+      "skills": [
+        "skill-standard"
+      ]
+    }
+  ]
+}
