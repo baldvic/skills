@@ -1,0 +1,34 @@
+{
+  "skill_name": "skills-catalog-housekeeping",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just added a new skill called 'example-skill' to this repo (a directory with a valid SKILL.md at the top level), but haven't touched skills.sh.json or README.md yet. Check the skills catalog.",
+      "expected_output": "The skill runs its self-consistency check between the .claude/skills/ and .cursor/skills/ copies first, then detects that 'example-skill' is missing from skills.sh.json's groupings and from README.md's Skills table and Repository layout tree, and fixes both directly — adding it to an appropriate grouping and a new README row/tree entry grounded in example-skill's own SKILL.md description — without asking for confirmation, since this is an additive gap.",
+      "expectations": [
+        "skills.sh.json gains an entry for example-skill in an existing grouping",
+        "README.md's Skills table gains a row for example-skill with a description grounded in its own SKILL.md frontmatter",
+        "README.md's Repository layout tree is updated to include example-skill/",
+        "No existing skill's entry or row is altered or removed"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Check the skills catalog. (skills.sh.json has a grouping entry naming a skill called 'old-removed-skill' that no longer exists as a directory in this repo, and README.md's Skills table still has a row for it too.)",
+      "expected_output": "The skill detects that both the skills.sh.json entry and the README.md row for 'old-removed-skill' reference a directory that no longer exists, and reports this as a stale reference requiring a decision — it does not delete either entry automatically, since the directory's absence could reflect an in-progress rename rather than an intentional removal.",
+      "expectations": [
+        "Neither skills.sh.json nor README.md is modified to remove the old-removed-skill entry without the maintainer confirming",
+        "The report explicitly names old-removed-skill and explains why it's flagged rather than auto-removed"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Check the skills catalog. (The .claude/skills/skills-catalog-housekeeping/SKILL.md and .cursor/skills/skills-catalog-housekeeping/SKILL.md copies have diverged from each other — one has an extra sentence the other doesn't.)",
+      "expected_output": "The skill's step 0 self-consistency check detects the two copies differ and reports the divergence before doing anything else — it does not silently proceed using one copy as if it were authoritative, and does not silently pick one to overwrite the other without flagging it first.",
+      "expectations": [
+        "The divergence between the two copies is explicitly reported",
+        "The skill does not silently resolve the divergence by overwriting one copy without surfacing it first"
+      ]
+    }
+  ]
+}

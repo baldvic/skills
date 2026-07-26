@@ -1,0 +1,50 @@
+## Context
+
+This repo (`this repo`) distributes Agent Skills via skills.sh: `skill-standard` and `agentify-project` are top-level sibling directories, each with its own `SKILL.md`, referenced by name in `skills.sh.json`'s `groupings`. `README.md` separately documents them in a "Skills" table and a "Repository layout" tree.
+
+Concrete drift found this session: `agentify-project` is committed, pushed, and already listed in `skills.sh.json`, but `README.md`'s "Skills" table still only mentions `skill-standard`. Nothing catches this class of gap today.
+
+Also established this session, from live research against skills.sh (not to be re-derived, just cited):
+- `skills.sh.json` schema (fetched from `https://skills.sh/schemas/skills.sh.schema.json`): `groupings` required, 1–50 entries; each entry requires `title` (1–120 chars) and `skills` (1–500 names), optional `description` (≤500 chars); optional `notGrouped` enum `"top"`/`"bottom"` (default `"bottom"`); `$schema` is the preferred field name over the legacy `schema`.
+- The `skills` CLI (`npx skills --help`) has no publish/register/submit command — only consumer commands (`add`, `use`, `remove`, `list`, `find`, `update`) and local-authoring commands (`init`, `experimental_sync`, `experimental_install`). skills.sh discovers a repo's skills purely by crawling public GitHub repos containing `skills.sh.json` + `SKILL.md` files; leaderboard ranking comes from anonymous CLI install telemetry. There is no action to "register" beyond committing and pushing accurate files.
+
+This repo's own `.claude/skills/` already holds several repo-internal, Claude-Code-only meta-skills (the `openspec-*` skills powering the `/opsx:*` slash commands) — precedent for a skill that exists purely to help maintain this repo itself, not to be redistributed. There is currently no `.cursor/skills/`, no `.agents/skills/` canonical store, and no `skills-lock.json` anywhere in this repo — the dual-harness canonical-store-plus-mirrors pattern that `agentify-project` teaches *other* repos to set up has never been self-applied here.
+
+## Goals / Non-Goals
+
+**Goals:**
+- Give this repo a repo-scoped skill that audits and fixes drift between its actual skill directories, `skills.sh.json`, and `README.md`.
+- Make that skill usable from both Claude Code and Cursor, per the user's explicit requirement, without inventing unnecessary new repo-wide infrastructure to do it.
+- Bake in the confirmed skills.sh facts (schema shape, no publish/register command) as grounding content so a future reader doesn't reinvent a fake registration step.
+- Fix the current concrete drift (`agentify-project` missing from `README.md`) as part of this change's own tasks, not left for the new skill's first run to discover.
+
+**Non-Goals:**
+- Not introducing PR-based delivery, a pre-flight prerequisite gate, or any of `agentify-project`'s safety machinery — this skill edits *this* repo directly, in an interactive session where the maintainer is already watching the diff live (normal `git diff`/IDE review before any commit), which is a fundamentally lower-blast-radius situation than `agentify-project` autonomously modifying a separate target repo.
+- Not making this a distributable, skills.sh-published skill (see Decision 2) — it hardcodes assumptions specific to this repo's own structure.
+- Not building or requiring the full `.agents/skills/` canonical-store + `skills-lock.json` machinery for this one skill (see Decision 1) — that apparatus exists to manage CLI-installed, registry-sourced skills; this skill is hand-authored and local.
+- Not automating this via a git hook or CI check — see Decision 3.
+
+## Decisions
+
+1. **Dual-harness availability via twin copies under `.claude/skills/` and `.cursor/skills/`, not a canonical `.agents/skills/` store.** The skill's `SKILL.md` (and any references) is placed at both `.claude/skills/skills-catalog-housekeeping/SKILL.md` and `.cursor/skills/skills-catalog-housekeeping/SKILL.md`, kept byte-identical. No `.agents/skills/` canonical store and no `skills-lock.json` are introduced for this. Rationale: this repo doesn't currently consume any CLI-installed/registry-sourced skills, so the canonical-store-plus-lockfile pattern (designed to reconcile CLI-managed installs across harnesses, per `agentify-project`'s own `references/custom-skill-drift-enforcement.md`) would be disproportionate machinery for one hand-authored, local skill; `.claude/skills/` already holds the precedent (the `openspec-*` meta-skills) for exactly this kind of repo-internal, non-distributed skill. To avoid the two copies silently drifting apart from each other — which would be an embarrassing failure mode for a skill whose whole job is catching drift — the skill's own instructions include a step that diffs its own two copies for consistency as part of every run (see tasks). Alternative considered: bootstrap the full canonical-store + lockfile pattern now, self-applying `agentify-project`'s own recommendation to this repo — rejected for this change as disproportionate scope; worth revisiting later as a separate, deliberate "dogfood agentify-project on this repo" change if desired.
+
+2. **Not published via `skills.sh.json` — purely local repo tooling.** This skill is not added as a new top-level sibling distributed through skills.sh, and `skills.sh.json` is not modified to list it. Rationale: `skill-standard` and `agentify-project` are genuinely reusable in other repos; this skill hardcodes assumptions about *this* repo's own `README.md` structure and `skills.sh.json` groupings, so reusing it elsewhere would need real adaptation, not just installation. Alternative considered: publish it as a generalized "skills.sh repo housekeeping" skill any skills.sh-publishing repo could install — rejected as extra scope beyond what was asked; could be spun out later as its own generalized skill if there's real demand.
+
+3. **On-demand invocation only, no git hook or CI automation.** The skill activates when a maintainer asks for it conversationally (e.g. "I just added a new skill, check the catalog" / "update the README for the new skill") in either harness, not via a `pre-commit`/CI hook. Rationale: matches `agentify-project`'s own precedent of not fabricating a mechanism for a harness without an established one — Cursor has no equivalent to Claude Code's hook system confirmed in this repo's own prior research, so an automated-trigger design would be asymmetric across the two harnesses this skill must serve equally.
+
+4. **Fix classification mirrors `agentify-project`'s mechanical-vs-judgment split, adapted for adds vs. removals.** Reuse the proven mental model from `agentify-project/references/custom-skill-drift-enforcement.md`, adapted here: **additive gaps** (a skill directory not yet in `skills.sh.json`'s groupings or missing from `README.md`'s table/tree) are low-risk and get fixed directly — nothing is lost by adding a row. **Stale references** (a `skills.sh.json` grouping or `README.md` entry naming a directory that no longer exists) are reported to the maintainer rather than silently deleted, since a missing directory could mean an in-progress rename rather than genuine removal — asking costs nothing in an interactive session with no PR gate to make deferral awkward. **Prose-quality judgments** (is a skill's one-line README description still accurate/well-written) are reported as a recommendation, never auto-rewritten — same rationale as `agentify-project`'s judgment-based skill-content rule: rewriting someone's descriptive prose risks changing intent silently.
+5. **skills.sh.json schema rules are hardcoded as reference content, with their source cited, not fetched live per run.** The confirmed schema shape (grouping/skill/description limits, `notGrouped` enum, `$schema` vs. legacy `schema`) is written directly into the new skill's reference material, citing `https://skills.sh/schemas/skills.sh.schema.json` as the source and the date verified. Rationale: this is a small, repo-internal config check — fetching the live schema over the network on every invocation is a heavier dependency than warranted, unlike `agentify-project`'s MCP-install-command case where the underlying CLI surface was known to actively drift. Risk accepted: if skills.sh changes its schema, this skill's hardcoded copy could go stale without noticing — mitigated by citing the source URL so a future maintainer knows exactly what to re-verify and where.
+
+## Risks / Trade-offs
+
+- [Twin `.claude/skills/` and `.cursor/skills/` copies could drift from each other over time] → Mitigated by Decision 1's self-consistency check being part of every run; accepted as a known limitation of not adopting the heavier canonical-store pattern.
+- [Hardcoded skills.sh.json schema (Decision 5) could go stale if skills.sh changes it upstream] → Source URL and verification date are cited in the reference content specifically so this is easy to re-check later; not silently trusted forever.
+- [Not automating this via a hook means it only runs when a maintainer remembers to invoke it] → Accepted per Decision 3; the trigger is the skill's own `description` matching a maintainer's natural request, same activation model every other skill in this repo uses.
+
+## Migration Plan
+
+Purely additive: one new skill (two identical copies, one per harness) plus a one-time fix to `README.md`'s existing drift. No existing skill's behavior changes. Rollback is deleting the two new skill directories and reverting the `README.md` fix if this proves unwanted.
+
+## Open Questions
+
+- Should this skill eventually also check that each skill's `SKILL.md` frontmatter `name` matches its directory name and other `skill-standard` structural rules, or is that intentionally out of scope (already `skill-standard`'s job)? Leaning toward staying out of that territory entirely — this skill's job is catalog/doc *listing* accuracy, not per-skill *format* validation, which is what `skill-standard` already owns — but flagging in case scope should be widened.

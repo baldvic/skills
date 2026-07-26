@@ -29,6 +29,7 @@ Review skill content before use; installed skills run with the same permissions 
 | Skill | Purpose |
 |-------|---------|
 | [**skill-standard**](skill-standard/SKILL.md) | Author, validate, and improve portable skills — including evals and benchmarks to show a skill actually helps. |
+| [**agentify-project**](agentify-project/SKILL.md) | Set up a target codebase for AI coding agents — both Claude Code and Cursor — via a non-interactive staged pipeline delivered as a single pull request. |
 
 ### skill-standard — when to use it
 
@@ -65,6 +66,10 @@ skills/
 │   ├── references/         # Format, validation, eval schemas
 │   ├── agents/             # Grader & analyzer roles
 │   └── scripts/            # Optional tooling (e.g. benchmark aggregation)
+├── agentify-project/
+│   ├── SKILL.md            # Entry point (read this first)
+│   ├── references/         # Pre-flight gate, PR delivery, tool registry, docs template
+│   └── evals/              # Eval prompts and fixtures (development only)
 └── LICENSE
 ```
 
