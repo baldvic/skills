@@ -1,6 +1,6 @@
 ## Context
 
-This repo (`this repo`) distributes Agent Skills via skills.sh: `skill-standard` and `agentify-project` are top-level sibling directories, each with its own `SKILL.md`, referenced by name in `skills.sh.json`'s `groupings`. `README.md` separately documents them in a "Skills" table and a "Repository layout" tree.
+This repo distributes Agent Skills via skills.sh: `skill-standard` and `agentify-project` are top-level sibling directories, each with its own `SKILL.md`, referenced by name in `skills.sh.json`'s `groupings`. `README.md` separately documents them in a "Skills" table and a "Repository layout" tree.
 
 Concrete drift found this session: `agentify-project` is committed, pushed, and already listed in `skills.sh.json`, but `README.md`'s "Skills" table still only mentions `skill-standard`. Nothing catches this class of gap today.
 

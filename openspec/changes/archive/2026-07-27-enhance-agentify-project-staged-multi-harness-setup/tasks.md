@@ -66,7 +66,7 @@
 ## 10. Validate against skill-standard
 
 - [x] 10.1 Apply every item in `skill-standard/references/validation.md` to the revised `SKILL.md` and all new/changed reference files
-- [x] 10.2 Confirm no host-specific absolute paths or secrets were introduced anywhere in the skill tree, especially in any the reference repo-derived examples (genericize any repo-specific names/paths used as illustrations)
+- [x] 10.2 Confirm no host-specific absolute paths or secrets were introduced anywhere in the skill tree, especially in any reference-repo-derived examples (genericize any repo-specific names/paths used as illustrations)
 
 ## 11. Package
 

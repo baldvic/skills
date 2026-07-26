@@ -1,8 +1,8 @@
 ## Context
 
-`agentify-project` v1 (from `add-agentify-project-skill`) is a confirm-gated, single-harness (detected, not both) audit skill. This revision is grounded in a survey of `the reference repo`, a real repo that already does most of what's being asked for, plus a round of exploration that settled the delivery mechanism and safety model further than the initial proposal did.
+`agentify-project` v1 (from `add-agentify-project-skill`) is a confirm-gated, single-harness (detected, not both) audit skill. This revision is grounded in a survey of a real reference repo that already does most of what's being asked for, plus a round of exploration that settled the delivery mechanism and safety model further than the initial proposal did.
 
-**What the the reference repo survey found** (unchanged from the first draft of this design):
+**What the reference-repo survey found** (unchanged from the first draft of this design):
 
 - **Docs**: `docs/ARCHITECTURE.md` (system context, component/container Mermaid diagrams, service catalog table, RabbitMQ topology table, cross-service sequence diagrams, shared data model `erDiagram`, known issues) plus `docs/services/README.md` (index) and one `docs/services/<name>.md` per service (Role, Tech stack & entry point, HTTP API, Data models, RabbitMQ, Known issues — citing exact `file:line`).
 - **Harness scaffolding, three-way**: `.claude/` (skills, commands, `settings.local.json` — *not* `settings.json`), `.cursor/` (`rules/*.mdc` with `description`/`globs`/`alwaysApply` frontmatter, skills, commands), and `.agents/skills/` as the **canonical, CLI-managed** skill store with root `skills-lock.json` (source repo, `sourceType`, `skillPath`, `computedHash` per skill) — `.claude/skills/` and `.cursor/skills/` are the same skills mirrored per harness.
@@ -57,7 +57,7 @@
 
 5. **Both harnesses, always, fixed at exactly two.** The staged pipeline scaffolds Claude Code and Cursor unconditionally, regardless of which harness-specific directories currently exist, unless the user's request explicitly scopes to one. This is a closed set of two, not an open-ended N-harness system — adding a third harness later would be a deliberate future revision, not something the pipeline auto-discovers. Rationale: matches the reference repo's own three-way layout and the user's explicit confirmation that scope is fixed at these two.
 
-6. **Agent instructions: `CLAUDE.md` and `AGENTS.md` are not forced into lockstep duplication.** Per the the reference repo precedent, `CLAUDE.md` may stay a short, stable pointer while `AGENTS.md` (and, where relevant, Cursor rules) carry the fuller, evolving detail. For a small/new repo without such a split yet, the default draft is one reasonably-sized content set applied consistently; the split is offered as the repo grows, not forced upfront.
+6. **Agent instructions: `CLAUDE.md` and `AGENTS.md` are not forced into lockstep duplication.** Per the reference-repo precedent, `CLAUDE.md` may stay a short, stable pointer while `AGENTS.md` (and, where relevant, Cursor rules) carry the fuller, evolving detail. For a small/new repo without such a split yet, the default draft is one reasonably-sized content set applied consistently; the split is offered as the repo grows, not forced upfront.
 
 7. **Tool setup is an extensible supported-tools registry, not five bespoke integrations.** Each entry declares: `detect` (how to check it's already set up), `install` (how to set it up if missing), `scope` (`repo` — output is a committed file, goes in the PR — or `machine-global` — a local prerequisite for running the pipeline, never a PR deliverable), and an idempotency check. Initial entries:
    - **OpenSpec CLI** — `detect`: `openspec --version` succeeds; `install`: `npm install -g openspec`; `scope`: machine-global (the CLI itself) producing a `scope: repo` deliverable (`openspec init`'s output), run only if `openspec/` doesn't already exist.
