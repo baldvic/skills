@@ -1,0 +1,17 @@
+{
+  "name": "sample-cli-tool",
+  "version": "0.1.0",
+  "description": "A small Node.js CLI tool used as an agentify-project eval fixture.",
+  "type": "module",
+  "bin": {
+    "sample-cli": "./src/index.js"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0",
+    "eslint": "^9.0.0"
+  }
+}

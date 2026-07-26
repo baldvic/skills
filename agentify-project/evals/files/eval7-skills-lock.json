@@ -1,0 +1,10 @@
+{
+  "skills": {
+    "vitest-testing": {
+      "source": "baldvic/skills",
+      "sourceType": "registry",
+      "skillPath": "vitest-testing",
+      "computedHash": "sha256:placeholder0000000000000000000000000000000000000000000000000"
+    }
+  }
+}

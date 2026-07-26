@@ -1,0 +1,10 @@
+[project]
+name = "sample-api-service"
+version = "0.1.0"
+description = "A small FastAPI service used as an agentify-project eval fixture."
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

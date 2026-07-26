@@ -1,0 +1,10 @@
+[project]
+name = "billing-service"
+version = "0.1.0"
+dependencies = [
+    "fastapi>=0.110",
+    "psycopg2-binary>=2.9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

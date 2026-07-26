@@ -1,0 +1,16 @@
+name: CI
+on: [push]
+jobs:
+  gateway-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci --prefix gateway-service
+      - run: npm test --prefix gateway-service
+  billing-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -e billing-service
+      - run: pytest billing-service/tests
+  # notifications-service has no CI job yet — a real gap the analysis should surface

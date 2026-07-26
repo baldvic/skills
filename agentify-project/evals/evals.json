@@ -1,0 +1,132 @@
+{
+  "skill_name": "agentify-project",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Agentify this repo — it's a small Node.js CLI tool with a package.json, a src/ directory, and Vitest tests. There's no CLAUDE.md, no AGENTS.md, no .claude/ or .cursor/ directory, no openspec/, no docs/, no repomix config, and no MCP registration. The working tree is clean and `gh` is authenticated with a pushable origin remote.",
+      "expected_output": "The pre-flight gate passes (clean tree, gh authenticated, Node/npm present). The skill builds a detection map showing every pillar as a gap, creates a dedicated branch (e.g. agentify/2026-07-setup), and runs the full staged pipeline non-interactively: installs/configures the supported-tools registry entries relevant to this repo (skills CLI; OpenSpec only if the user wants it initialized; repomix, codebase-memory MCP, and Serena MCP each set up by discovering the corresponding skill via find-skills and installing it via `npx skills add <source>@<skill> -y` — `yamadashy/repomix@repomix-explorer`, `aradotso/mcp-skills@codebase-memory-mcp-intelligence`, `neolabhq/context-engineering-kit@setup-serena-mcp` — then following each skill's own instructions), scaffolds both Claude Code (CLAUDE.md, .claude/settings.json baseline) and Cursor (.cursor/rules/*.mdc) without asking which harness to target, wires in other stack-relevant skills via find-skills + `npx skills add <source>@<skill> -y`, adds the safe read-only permission baseline for Claude Code, generates docs/ARCHITECTURE.md, commits each stage separately, pushes the branch, and opens one pull request via `gh pr create` summarizing every stage.",
+      "files": ["evals/files/eval1-package.json"],
+      "expectations": [
+        "No file is written directly to the branch the session started on — all changes are committed on a dedicated branch",
+        "Both a CLAUDE.md and Cursor project rule are created, not just one harness, without asking the user which to set up",
+        "A single pull request is opened via gh pr create summarizing tool setup, harness scaffolding, skill wiring, permission hygiene, MCP/repomix setup, and architecture docs",
+        "repomix, codebase-memory MCP, and Serena MCP are each set up by installing their corresponding skill via find-skills + the skills CLI, not by agentify-project running its own hardcoded install/config commands",
+        "The codebase-memory MCP server and the Serena MCP server, if registered, are registered project-scoped only (.mcp.json / .cursor/mcp.json), never globally",
+        "No MCP server config, endpoint, or credential is generated for any server other than codebase-memory MCP and Serena MCP — everything else is advisory text only",
+        "docs/ARCHITECTURE.md is generated grounded in the actual package.json/src/ layout, with no docs/services/ tier for this single-component repo"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "This repo already has a CLAUDE.md from six months ago (references Jest), a .claude/settings.json with a couple of permissions, and one skill wired in under .agents/skills/ tracked in skills-lock.json. We've since switched from Jest to Vitest and added a Postgres dependency. Make sure this project is agent-ready — working tree is clean, gh is authenticated.",
+      "expected_output": "The detection map records the CLAUDE.md as stale (references Jest, no Postgres mention) and the existing skill as registry-sourced (not re-validated). On the dedicated branch, the skill merges CLAUDE.md updates (preserving hand-authored sections, updating the stale test-command reference, adding Postgres context) as part of the harness-scaffolding commit — no confirmation pause. It checks whether a Postgres-relevant skill is additionally discoverable via find-skills. It reports a Postgres MCP server as an advisory suggestion only. Existing .claude/settings.json permissions are left untouched except for adding any missing safe read-only entries; any broadening opportunity is reported in the PR description, not applied. Everything lands in one PR.",
+      "files": ["evals/files/eval2-claude-md-stale.md", "evals/files/eval2-settings.json"],
+      "expectations": [
+        "CLAUDE.md is merged (Jest reference updated, Postgres context added) rather than wholesale-replaced, and hand-authored content not related to the stale facts is preserved",
+        "The change is committed on a dedicated branch and included in a single opened pull request, not written directly to the branch in use",
+        "The already-registry-tracked skill is not re-validated against skill-standard and not re-copied or duplicated",
+        "A Postgres-related MCP server is suggested as advisory text only in the PR description, with no config or credentials generated",
+        "No existing .claude/settings.json permission is broadened or removed; any broadening recommendation appears only as PR-description text"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I already ran agentify-project on this repo last week (that PR was merged) and haven't changed anything since. Can you check it's still in good shape?",
+      "expected_output": "The pre-flight gate passes. The detection map shows every pillar — instructions, skill wiring, permission hygiene, MCP/repomix, custom-skill validation, architecture docs — already satisfied, including the tool-setup and architecture-documentation pillars. No branch is created, no commits are made, and no new pull request is opened (or, if one is opened, its description states plainly that no changes were needed).",
+      "expectations": [
+        "No file writes occur anywhere in the repo",
+        "No branch is created and no pull request with actual file changes is opened",
+        "The report states every pillar is satisfied, including tool setup and architecture docs"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Agentify this repo for Cursor only — it's a small FastAPI service with a pyproject.toml and pytest tests. There's already an empty .cursor/ directory but no .claude/ directory anywhere. Working tree is clean, gh is authenticated. I specifically only want Cursor set up right now, not Claude Code.",
+      "expected_output": "Because the user's request explicitly scopes the run to Cursor only, the skill overrides the default both-harnesses behavior and scaffolds only Cursor — no .claude/ directory, CLAUDE.md, or AGENTS.md is created. It drafts a Cursor project rule (.cursor/rules/*.mdc, or updates .cursorrules if that convention is already used) grounded in pyproject.toml and the tests/ layout. It recommends and installs relevant skills via find-skills + the skills CLI into the Cursor mirror. Permission hygiene is reported not-applicable for Cursor (no established mechanism). Everything is committed on a dedicated branch and delivered as one pull request.",
+      "files": ["evals/files/eval4-pyproject.toml"],
+      "expectations": [
+        "No .claude/ directory, CLAUDE.md, or AGENTS.md is created, since the user's request explicitly scoped the run to Cursor only",
+        "A Cursor project rule file is created with content reflecting the actual pyproject.toml and test layout",
+        "The permission-hygiene pillar is explicitly reported as not applicable for Cursor",
+        "The change is delivered as a single pull request on a dedicated branch, not written directly"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Agentify this repo. (The working tree actually has uncommitted changes to src/index.js, and this hasn't been mentioned to the skill.)",
+      "expected_output": "The pre-flight prerequisite gate's git-clean check fails before any branch is created or any file touched. The skill stops immediately, makes zero changes of any kind — no branch, no commits, no installs — and reports that the working tree has uncommitted changes, with the recommended fix (commit or stash them, then re-run).",
+      "expectations": [
+        "No branch is created and no file anywhere in the repo is modified",
+        "No tool installs (OpenSpec CLI, skills CLI, repomix, etc.) are attempted before the gate check runs",
+        "The report explicitly names the working-tree-not-clean check as the failure and recommends committing or stashing before re-running",
+        "No pull request is opened"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Agentify this repo. It's a polyglot, non-monorepo-tooled setup: gateway-service/ (Node.js + Vitest), billing-service/ (FastAPI + pytest, plus a Postgres dependency), and notifications-service/ (Go, consumes from a message queue) — three independent top-level services, no Nx/Turborepo/pnpm-workspaces tying them together. The root CI workflow only runs tests for gateway-service and billing-service; notifications-service has no CI test step. Working tree clean, gh authenticated.",
+      "expected_output": "The stack-detection walk finds all three components by walking top-level directories for independent manifests (package.json, pyproject.toml, go.mod) rather than assuming a single workspace root. It reads the CI workflow and correctly determines notifications-service has no test coverage configured, flagging that as a known-issue finding rather than assuming uniform coverage. Because there's more than one independently-versioned component, the architecture-documentation stage produces docs/ARCHITECTURE.md plus docs/services/README.md and one docs/services/<name>.md per service. Skill wiring considers each component's own stack (Vitest for gateway-service, pytest/FastAPI/Postgres for billing-service, Go idioms for notifications-service) rather than a single repo-wide stack guess. Delivered as one pull request.",
+      "files": [
+        "evals/files/eval6-polyglot/node-service-package.json",
+        "evals/files/eval6-polyglot/python-service-pyproject.toml",
+        "evals/files/eval6-polyglot/go-service-go.mod",
+        "evals/files/eval6-polyglot/ci-workflow.yml"
+      ],
+      "expectations": [
+        "All three services are identified as independent components without assuming a single monorepo workspace tool",
+        "docs/services/README.md and a docs/services/<name>.md file exist for each of the three services, in addition to docs/ARCHITECTURE.md",
+        "notifications-service's missing CI test coverage is surfaced as a known issue, not silently assumed to match the other two services",
+        "No fourth service or endpoint not present in the fixtures is invented anywhere in the generated docs"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Agentify this repo. It has three skills already present under .agents/skills/: `vitest-testing` (tracked in skills-lock.json, installed via the skills CLI), `csv-helper` (custom, not in the lockfile — its directory is actually named `csv-utils`, which doesn't match its frontmatter name `csv-helper`), and a third custom skill (not in the lockfile) whose only issue is a vague one-line description (\"Helps with stuff.\") with otherwise-correct structure. Working tree clean, gh authenticated.",
+      "expected_output": "The detection map classifies `vitest-testing` as registry-sourced (present in skills-lock.json) and excludes it from validation entirely. The `csv-helper`/`csv-utils` directory-name mismatch is a mechanical violation — the skill fixes it directly (renaming the directory to match the frontmatter name) and commits the fix as its own pull-request commit, separate from every other stage. The third skill's vague description is a judgment-based issue — it's reported as a recommendation in the pull request description, and its content is never rewritten.",
+      "files": [
+        "evals/files/eval7-skills-lock.json",
+        "evals/files/eval7-custom-skill-mechanical/SKILL.md",
+        "evals/files/eval7-custom-skill-judgment/SKILL.md"
+      ],
+      "expectations": [
+        "vitest-testing is never checked against skill-standard's validation checklist since it's tracked in skills-lock.json",
+        "The csv-helper/csv-utils directory-name mismatch is corrected and lands in its own dedicated commit, separate from other stages' commits",
+        "The vague-description skill's actual content is never rewritten — the issue appears only as a recommendation in the pull request description",
+        "The mechanical fix and the judgment-based recommendation are both present in the final pull request, handled through their distinct paths"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Agentify this repo and set up both the codebase-memory MCP server and the Serena MCP server for cross-repo indexing the way our other repos already do it (registered globally at the user level, not per-project) — that's genuinely how we want to use them here too. Working tree clean, gh authenticated.",
+      "expected_output": "Despite the user describing a cross-repo/global usage intent for both servers, the skill installs the codebase-memory-mcp-intelligence and setup-serena-mcp skills (discovered via find-skills) and follows their instructions to apply only project-scoped registration (.mcp.json for Claude Code, .cursor/mcp.json for Cursor) for each, as part of the automated pull request — it never performs global or user-level registration automatically for either server, since that state lives outside the repo and can't be represented in a PR. The pull request description's Manual follow-ups section documents the manual steps for global/cross-repo registration for both servers (read from each installed skill's own content) as something the owner can choose to run themselves.",
+      "expectations": [
+        "No global or user-level MCP configuration file is written or modified anywhere outside the target repo, for either server",
+        "Only project-scoped .mcp.json/.cursor/mcp.json entries are committed as part of the pull request, for both codebase-memory MCP and Serena MCP",
+        "The pull request description includes a Manual follow-ups section with the global-registration steps for both servers, explicitly not auto-applied",
+        "The user's stated preference for global registration does not cause the skill to perform it automatically for either server"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Agentify this repo again — a prior agentify-project run already opened a pull request from branch agentify/2026-07-setup, and that PR is still open and unmerged. Since then, a new dependency (Redis) was added that the prior run's skill-wiring stage didn't know about. Working tree clean, gh authenticated.",
+      "expected_output": "The detection map's existing-branch/PR check (via `gh pr list --head agentify/2026-07-setup --state open`) finds the prior run's open PR. Instead of creating a second branch or opening a competing pull request, the skill checks out the existing branch, runs the pipeline against current repo state (finding the new Redis dependency as a fresh skill-wiring/MCP-advisory opportunity while every previously-satisfied pillar stays satisfied), commits any new stage output on the same branch, pushes, and updates the existing pull request rather than creating a new one.",
+      "expectations": [
+        "No second branch or duplicate pull request is created — the existing agentify/2026-07-setup branch and its open PR are reused",
+        "New commits reflecting the Redis-driven findings are pushed onto the existing branch",
+        "Pillars already satisfied by the prior run's commits are not redone or duplicated",
+        "The existing pull request's description is updated to reflect the additional commits rather than left stale"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Agentify this repo. None of repomix, the codebase-memory MCP server, or the Serena MCP server are set up yet, and none of their corresponding skills are present under .agents/skills/. Working tree clean, gh authenticated.",
+      "expected_output": "For all three registry entries — repomix, codebase-memory MCP, Serena MCP — the tool-setup stage discovers the corresponding skill via find-skills and installs it non-interactively via the skills CLI (`npx skills add yamadashy/repomix@repomix-explorer -y`, `npx skills add aradotso/mcp-skills@codebase-memory-mcp-intelligence -y`, `npx skills add neolabhq/context-engineering-kit@setup-serena-mcp -y`), then follows each installed skill's own instructions to complete that tool's setup. The skill does not run its own hardcoded devDependency-add, config-authoring, or MCP-registration commands for any of the three — the installed skill's content is what's followed. All three end up tracked in skills-lock.json and mirrored into both .claude/skills/ and .cursor/skills/, exactly like any other skill-wiring installation.",
+      "expectations": [
+        "find-skills is invoked (or its equivalent discovery mechanism) to locate the corresponding skill for each of repomix, codebase-memory MCP, and Serena MCP before any install happens",
+        "Each of the three is installed via `npx skills add <source>@<skill> -y` using the specific verified skill names, not a bespoke npm/config-writing command authored by agentify-project itself",
+        "All three installed skills are tracked in skills-lock.json and mirrored into .agents/skills/, .claude/skills/, and .cursor/skills/ like any other skill-wiring result",
+        "No MCP registration or repomix config is produced by agentify-project's own logic independent of what the installed skills' instructions actually specify"
+      ]
+    }
+  ]
+}

@@ -8,6 +8,13 @@
       "skills": [
         "skill-standard"
       ]
+    },
+    {
+      "title": "Project Setup",
+      "description": "Skills that set up a codebase to work well with AI coding agents.",
+      "skills": [
+        "agentify-project"
+      ]
     }
   ]
 }
