@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "last_sync_at": null,
+  "notes": "Updated by the upstream sync pipeline in references/upstream-sync.md. resolved_commit is the git SHA last merged into this skill.",
+  "sources": [
+    {
+      "id": "agentskills",
+      "label": "Agent Skills open format",
+      "repo": "https://github.com/agentskills/agentskills.git",
+      "default_ref": "main",
+      "resolved_commit": null,
+      "license": "Code Apache-2.0; docs CC-BY-4.0 (see upstream repo)",
+      "mappings": [
+        {
+          "upstream": "docs/specification.mdx",
+          "local": "references/agent-skills-format.md",
+          "merge_strategy": "spec_text"
+        },
+        {
+          "upstream": "docs/skill-creation/best-practices.mdx",
+          "local": "references/agent-skills-format.md",
+          "section": "Authoring principles",
+          "merge_strategy": "spec_text"
+        },
+        {
+          "upstream": "docs/skill-creation/evaluating-skills.mdx",
+          "local": "references/eval-artifacts.md",
+          "merge_strategy": "eval_schema"
+        },
+        {
+          "upstream": "docs/skill-creation/optimizing-descriptions.mdx",
+          "local": "references/description-tuning.md",
+          "merge_strategy": "spec_text"
+        },
+        {
+          "upstream": "skills-ref/tests/test_validator.py",
+          "local": "references/validation.md",
+          "merge_strategy": "validation_rules",
+          "note": "Infer rules from tests when validator source is not vendored"
+        }
+      ]
+    },
+    {
+      "id": "anthropics-skill-creator",
+      "label": "skill-creator (example skills)",
+      "repo": "https://github.com/anthropics/skills.git",
+      "default_ref": "main",
+      "resolved_commit": null,
+      "skill_root": "skills/skill-creator",
+      "install_via_skills_cli": "anthropics/skills@skill-creator",
+      "license": "See upstream skills/skill-creator/LICENSE.txt",
+      "mappings": [
+        {
+          "upstream": "skills/skill-creator/references/schemas.md",
+          "local": "references/eval-artifacts.md",
+          "merge_strategy": "eval_schema"
+        },
+        {
+          "upstream": "skills/skill-creator/agents/grader.md",
+          "local": "agents/grader.md",
+          "merge_strategy": "procedure_strip_harness"
+        },
+        {
+          "upstream": "skills/skill-creator/agents/analyzer.md",
+          "local": "agents/analyzer.md",
+          "merge_strategy": "procedure_strip_harness"
+        },
+        {
+          "upstream": "skills/skill-creator/SKILL.md",
+          "local": "references/eval-artifacts.md",
+          "sections": [
+            "workspace layout",
+            "eval loop"
+          ],
+          "merge_strategy": "eval_schema",
+          "note": "Port eval/benchmark flow only; do not copy harness-specific steps"
+        },
+        {
+          "upstream": "skills/skill-creator/scripts/aggregate_benchmark.py",
+          "local": "scripts/aggregate_benchmark.py",
+          "merge_strategy": "script_stdlib_only"
+        }
+      ]
+    }
+  ],
+  "local_only": [
+    "references/upstream-sources.md",
+    "references/upstream-sync.md",
+    "references/upstream-changelog.md",
+    "upstream.lock.json",
+    "SKILL.md sections: Harness-agnostic rules, Upstream sync, runtime self-containment"
+  ]
+}
