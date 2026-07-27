@@ -13,9 +13,12 @@ This repo publishes reusable **Agent Skills** — procedural knowledge (`SKILL.m
 
 When adding, renaming, or removing a top-level distributed skill, run the **skills-catalog-housekeeping** skill to keep `skills.sh.json` and `README.md` in sync. It exists in two byte-identical copies (`.claude/skills/skills-catalog-housekeeping/` and `.cursor/skills/skills-catalog-housekeeping/`) — if you edit one, mirror the edit into the other.
 
+Known, currently-unresolved exception to "byte-identical": `.claude/skills/skills-catalog-housekeeping/evals/` exists but has no `.cursor/` counterpart. `SKILL.md` and `references/` do match. This is a real, standing divergence, not a one-off — expect the self-consistency check to keep flagging it until someone deliberately decides to add the missing `evals/` or leave it Claude-only on purpose.
+
 ## Public repo: never leak machine-specific data
 
 This repo is crawled publicly by skills.sh and cloned by strangers. Before committing or pushing anything:
+
 - No absolute local paths (`C:\Users\...`, `D:\projects\...`, `/home/<user>/...`) in any file.
 - No real usernames, personal/company emails, or hostnames.
 - No names of private/internal repos or systems used as illustrative examples — genericize them (e.g. "a reference repo" instead of naming one).
@@ -34,3 +37,7 @@ Skills in this repo (`agentify-project`'s custom-skill validation, `skills-catal
 ## No build/test tooling
 
 This repo has no `package.json`, build step, or CI test suite — it only distributes skill definitions (markdown plus optional scripts/evals). Individual skills may carry their own `evals/evals.json` (see `skill-standard/references/eval-artifacts.md`) for self-validation; there's no repo-wide test command to run.
+
+## Keeping this file current
+
+Unlike the short-pointer-vs-living-log split `agentify-project` sets up for *other* repos' `CLAUDE.md`/`AGENTS.md`, this repo has only this one file — there's no separate `CLAUDE.md` to keep terse while this one grows. If something here goes stale (a new top-level skill category, a changed workflow), update this file directly as part of that change rather than leaving it to drift; it isn't synced by any skill or check.
